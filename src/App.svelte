@@ -1,43 +1,62 @@
 <script>
+    import axios from "axios";
     let isListening = false;
-    let note = "";
-    let stopMic = false;
-    window.SpeechRecognition =
-        window.SpeechRecognition || window["webkitSpeechRecognition"];
-    const mic = new window.SpeechRecognition();
-    mic.continuous = true;
-    mic.interimResults = true;
-    mic.lang = "en-US";
+    let mediaStream, recorder, blob, note;
+    let chunks = [];
 
-    function handleMic(..._args) {
-        stopMic = false;
-        if (isListening) {
-            mic.start();
-            mic.onend = (ev) => {
-                console.log(ev);
-                mic.start();
+    const reset = () => {
+        mediaStream = undefined;
+        recorder = undefined;
+        chunks = [];
+    };
+
+    const handleMicChange = async () => {
+        if (!isListening) {
+            isListening = true;
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false,
+            });
+            //@ts-ignore
+            recorder = new MediaRecorder(mediaStream);
+            recorder.start();
+            recorder.ondataavailable = ({ data }) => chunks.push(data);
+            recorder.onstop = async () => {
+                blob = new Blob(chunks, { type: "audio/ogg" });
+                const formData = new FormData();
+                const file = new File([blob], "ivr.ogg", {
+                    lastModified: new Date().getTime(),
+                });
+                formData.append("audio", file);
+                // const reader = new FileReader();
+                // reader.readAsDataURL(blob);
+                // reader.onloadend = async () => {
+                //     const result = reader.result;
+                //     console.log(result);
+                //     note = (
+                //         await axios.post(
+                //             "http://localhost:5000/",
+                //             { content: result },
+                //             {}
+                //         )
+                //     ).data.msg;
+                // };
+                note = (
+                    await axios.post("http://localhost:5000/", formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    })
+                ).data.msg;
             };
         } else {
-            mic.stop();
-            mic.onend = (ev) => {
-                console.log(ev);
-            };
+            isListening = false;
+            if (mediaStream)
+                mediaStream.getAudioTracks().forEach((track) => track.stop());
+            if (recorder) recorder.stop();
+            reset();
         }
-        mic.onstart = () => {
-            console.log("Mic is On!");
-        };
-        mic.onresult = (ev) => {
-            const transcript = Array.from(ev.results)
-                .map((sr) => sr[0].transcript)
-                .join("");
-            note = transcript;
-            mic.onerror = (event) => console.log(event.error);
-        };
-    }
-
-    $: stopMic && mic.stop();
-
-    $: handleMic(isListening);
+    };
 </script>
 
 <svelte:head>
@@ -47,10 +66,20 @@
 <main>
     <div>
         <h1>Tap to Speak</h1>
-        <button on:click={() => (isListening = !isListening)}>
+        <button on:click={handleMicChange}>
             {isListening ? "stop 🛑" : "start 🎙"}
         </button>
-        <p>{note}</p>
+        {#if note}
+            <p>{note}</p>
+        {/if}
+        {#if blob}
+            <audio controls src={URL.createObjectURL(blob)} />
+            <button
+                ><a href={URL.createObjectURL(blob)} download="test1.mp3">
+                    Download
+                </a></button
+            >
+        {/if}
     </div>
 </main>
 

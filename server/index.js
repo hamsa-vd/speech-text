@@ -33,8 +33,6 @@ try {
     console.log(error);
 }
 
-console.log(Buffer.from(readFileSync("google-credentials.json")).toString());
-
 process.env.GOOGLE_APPLICATION_CREDENTIALS = "google-credentials.json";
 
 const client = new SpeechClient();
@@ -43,7 +41,6 @@ app.get("/", (req, res) => res.send("make a 'POST' request, not 'GET'"));
 
 app.post("/", upload.single("audio"), async (req, res) => {
     const file = req.file;
-    if (file) console.log("received file " + file.filename);
     const content = Buffer.from(file.buffer).toString("base64");
     const products = [
         "id",

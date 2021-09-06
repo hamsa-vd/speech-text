@@ -10,6 +10,7 @@ app.use(cors());
 
 try {
     if (!existsSync("google-credentials.json")) {
+        console.log("google credetials file is not created");
         const googleCred = {
             type: process.env.GOOGLE_TYPE,
             project_id: process.env.GOOGLE_PROJECT_ID,
@@ -36,6 +37,7 @@ app.get("/", (req, res) => res.send("make a 'POST' request, not 'GET'"));
 
 app.post("/", upload.single("audio"), async (req, res) => {
     const file = req.file;
+    if (file) console.log("received file " + file.filename);
     const content = Buffer.from(file.buffer).toString("base64");
     const products = [
         "id",
@@ -75,6 +77,7 @@ app.post("/", upload.single("audio"), async (req, res) => {
                 .join("\n");
             res.status(200).json({ msg: transcription });
         } catch (err) {
+            console.log(err);
             res.status(400).json(err);
         }
     else res.status(400).json(req.body);

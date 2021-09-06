@@ -9,7 +9,7 @@ app.use(json());
 app.use(cors());
 
 try {
-    if (!existsSync("google-cred.json")) {
+    if (!existsSync("google-credentials.json")) {
         const googleCred = {
             type: process.env.GOOGLE_TYPE,
             project_id: process.env.GOOGLE_PROJECT_ID,
@@ -23,7 +23,7 @@ try {
                 process.env.AUTH_PROVIDER_X509_CERT_URL,
             client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
         };
-        writeFileSync("google-cred.json", JSON.stringify(googleCred));
+        writeFileSync("google-credentials.json", JSON.stringify(googleCred));
     }
 } catch (error) {
     console.log(error);
@@ -31,6 +31,8 @@ try {
 process.env.GOOGLE_APPLICATION_CREDENTIALS = "google-credentials.json";
 
 const client = new SpeechClient();
+
+app.get("/", (req, res) => res.send("make a 'POST' request, not 'GET'"));
 
 app.post("/", upload.single("audio"), async (req, res) => {
     const file = req.file;

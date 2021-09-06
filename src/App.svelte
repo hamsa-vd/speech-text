@@ -42,11 +42,15 @@
                 //     ).data.msg;
                 // };
                 note = (
-                    await axios.post("http://localhost:5000/", formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    })
+                    await axios.post(
+                        "https://hava-eaton.herokuapp.com/",
+                        formData,
+                        {
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                            },
+                        }
+                    )
                 ).data.msg;
             };
         } else {

@@ -1,15 +1,19 @@
-const { readFileSync, writeFileSync, existsSync } = require("fs");
+const { readFileSync, writeFileSync, existsSync, statSync } = require("fs");
 const { SpeechClient } = require("@google-cloud/speech");
 const app = require("express")();
 const cors = require("cors");
 const upload = require("multer")();
 const { json } = require("body-parser");
+require("dotenv").config();
 
 app.use(json());
 app.use(cors());
 
 try {
-    if (!existsSync("google-credentials.json")) {
+    if (
+        !existsSync("google-credentials.json") ||
+        statSync("google-credentials.json").size < 200
+    ) {
         const googleCred = {
             type: process.env.GOOGLE_TYPE,
             project_id: process.env.GOOGLE_PROJECT_ID,
@@ -23,7 +27,6 @@ try {
                 process.env.AUTH_PROVIDER_X509_CERT_URL,
             client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
         };
-        console.log(googleCred);
         writeFileSync("google-credentials.json", JSON.stringify(googleCred));
     }
 } catch (error) {

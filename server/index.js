@@ -10,7 +10,6 @@ app.use(cors());
 
 try {
     if (!existsSync("google-credentials.json")) {
-        console.log("google credetials file is not created");
         const googleCred = {
             type: process.env.GOOGLE_TYPE,
             project_id: process.env.GOOGLE_PROJECT_ID,
@@ -24,11 +23,15 @@ try {
                 process.env.AUTH_PROVIDER_X509_CERT_URL,
             client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
         };
+        console.log(googleCred);
         writeFileSync("google-credentials.json", JSON.stringify(googleCred));
     }
 } catch (error) {
     console.log(error);
 }
+
+console.log(Buffer.from(readFileSync("google-credentials.json")).toString());
+
 process.env.GOOGLE_APPLICATION_CREDENTIALS = "google-credentials.json";
 
 const client = new SpeechClient();

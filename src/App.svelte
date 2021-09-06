@@ -71,9 +71,11 @@
         </button>
         {#if note}
             <p>{note}</p>
+        {:else if note === ""}
+            <p>Please say again</p>
         {/if}
         {#if blob}
-            <audio controls src={URL.createObjectURL(blob)} />
+            <audio autoplay={false} controls src={URL.createObjectURL(blob)} />
             <button
                 ><a href={URL.createObjectURL(blob)} download="test1.mp3">
                     Download
@@ -132,7 +134,7 @@
                 }
             }
             p {
-                margin-top: 2rem;
+                margin-block: 2rem;
                 font-size: 2rem;
                 color: rgb(62, 83, 87);
             }

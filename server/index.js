@@ -17,7 +17,7 @@ try {
             private_key: process.env.GOOGLE_PRIVATE_KEY,
             client_email: process.env.GOOGLE_CLIENT_EMAIL,
             client_id: process.env.GOOGLE_CLIENT_ID,
-            auth_uri: process.env.GOOGLE.AUTH_URI,
+            auth_uri: process.env.GOOGLE_AUTH_URI,
             token_uri: process.env.GOOGLE_TOKEN_URI,
             auth_provider_x509_cert_url:
                 process.env.AUTH_PROVIDER_X509_CERT_URL,
@@ -28,13 +28,30 @@ try {
 } catch (error) {
     console.log(error);
 }
-process.env.GOOGLE_APPLICATION_CREDENTIALS = "google-cred.json";
+process.env.GOOGLE_APPLICATION_CREDENTIALS = "google-credentials.json";
 
 const client = new SpeechClient();
 
 app.post("/", upload.single("audio"), async (req, res) => {
     const file = req.file;
     const content = Buffer.from(file.buffer).toString("base64");
+    const products = [
+        "id",
+        "1MM",
+        "1MP",
+        "MB8",
+        "MBE20",
+        "3MM",
+        "3MP",
+        "35MM",
+        "37MM",
+        "1MCB",
+        "3MCB",
+        "1MTB",
+        "3MTB",
+        "1MFS",
+        "3MFS",
+    ];
     if (content)
         try {
             const [response] = await client.recognize({
@@ -43,26 +60,10 @@ app.post("/", upload.single("audio"), async (req, res) => {
                     sampleRateHertz: 48000,
                     languageCode: "en-US",
                     speechContexts: [
-                        {
-                            phrases: [
-                                "id",
-                                "1MM",
-                                "1MP",
-                                "MB8",
-                                "MBE20",
-                                "3MM",
-                                "3MP",
-                                "35MM",
-                                "37MM",
-                                "1MCB",
-                                "3MCB",
-                                "1MTB",
-                                "3MTB",
-                                "1MFS",
-                                "3MFS",
-                            ],
+                        ...products.map((product) => ({
+                            phrases: [product],
                             boost: 20.0,
-                        },
+                        })),
                     ],
                 },
                 audio: { content },
@@ -74,7 +75,10 @@ app.post("/", upload.single("audio"), async (req, res) => {
         } catch (err) {
             res.status(400).json(err);
         }
-    else res.json(req.body);
+    else res.status(400).json(req.body);
 });
 
-app.listen(5000, () => console.log("server started at localhost:5000"));
+const port = process.env.PORT || 5000;
+app.listen(port, () =>
+    console.log("server started at http://localhost:" + port)
+);

@@ -1,7 +1,7 @@
 const { readFileSync } = require("fs");
 const { SpeechClient } = require("@google-cloud/speech");
 
-process.env.GOOGLE_APPLICATION_CREDENTIALS = "google-cred.json";
+process.env.GOOGLE_APPLICATION_CREDENTIALS = "google-credentials.json";
 
 const client = new SpeechClient();
 

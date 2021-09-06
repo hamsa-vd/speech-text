@@ -2,6 +2,6 @@
 /dist/
 /.vscode/
 .DS_Store
-google-cred.json
+google-credentials.json
 yarn.lock
 package-lock.json

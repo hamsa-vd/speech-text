@@ -1,7 +1,7 @@
 from os import environ
 from google.cloud import speech
 
-environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google-cred.json"
+environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google-credentials.json"
 speech_client = speech.SpeechClient()
 
 with open("commands/check.mp3", 'rb') as f:

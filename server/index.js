@@ -10,7 +10,6 @@ app.use(json());
 app.use(cors());
 
 try {
-    unlinkSync("google-credentials.json");
     if (!existsSync("google-credentials.json")) {
         const googleCred = {
             type: process.env.GOOGLE_TYPE,

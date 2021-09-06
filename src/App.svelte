@@ -3,6 +3,7 @@
     let isListening = false;
     let mediaStream, recorder, blob, note;
     let chunks = [];
+    const dev = import.meta.env.DEV;
 
     const reset = () => {
         mediaStream = undefined;
@@ -41,16 +42,15 @@
                 //         )
                 //     ).data.msg;
                 // };
+                const url = dev
+                    ? "http://localhost:5000"
+                    : "https://hava-eaton.herokuapp.com/";
                 note = (
-                    await axios.post(
-                        "https://hava-eaton.herokuapp.com/",
-                        formData,
-                        {
-                            headers: {
-                                "Content-Type": "multipart/form-data",
-                            },
-                        }
-                    )
+                    await axios.post(url, formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    })
                 ).data.msg;
             };
         } else {

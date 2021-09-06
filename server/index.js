@@ -1,4 +1,4 @@
-const { readFileSync, writeFileSync, existsSync, statSync } = require("fs");
+const { writeFileSync, existsSync, unlinkSync } = require("fs");
 const { SpeechClient } = require("@google-cloud/speech");
 const app = require("express")();
 const cors = require("cors");
@@ -10,10 +10,8 @@ app.use(json());
 app.use(cors());
 
 try {
-    if (
-        !existsSync("google-credentials.json") ||
-        statSync("google-credentials.json").size < 200
-    ) {
+    unlinkSync("google-credentials.json");
+    if (!existsSync("google-credentials.json")) {
         const googleCred = {
             type: process.env.GOOGLE_TYPE,
             project_id: process.env.GOOGLE_PROJECT_ID,
